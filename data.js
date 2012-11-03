@@ -767,13 +767,13 @@ var iterate = function(is)
 			ret.smartphoneShare.push(smr3(cur.smartphoneShare));
 		}
 	}
-	var smr1=simple_moving_averager(10);
-    var smr2=simple_moving_averager(10);
-    var smr3=simple_moving_averager(10);
+	var smr1=simple_moving_averager(3);
+    var smr2=simple_moving_averager(3);
+    var smr3=simple_moving_averager(3);
 	var data={"volume":[],"phoneShare":[],"smartphoneShare":[]};
 	for(var i=1;i<ret.volume.length;i++){
 		var start=ret.volume[i-1];
-		var mod=(ret.volume[i]-ret.volume[i-1])/100;
+		var mod=(ret.volume[i]-ret.volume[i-1])/5;
 		for(var j=0;j!=5;j++){
 			start += mod;
 			data.volume.push(smr1(start));
@@ -781,7 +781,7 @@ var iterate = function(is)
 	}
 	for(var i=1;i<ret.volume.length;i++){
 		var start=ret.phoneShare[i-1];
-		var mod=(ret.phoneShare[i]-ret.phoneShare[i-1])/100;
+		var mod=(ret.phoneShare[i]-ret.phoneShare[i-1])/5;
 		for(var j=0;j!=5;j++){
 			start += mod;
 			data.phoneShare.push(smr2(start));
@@ -789,7 +789,7 @@ var iterate = function(is)
 	}
 	for(var i=1;i<ret.volume.length;i++){
 		var start=ret.smartphoneShare[i-1];
-		var mod=(ret.smartphoneShare[i]-ret.smartphoneShare[i-1])/100;
+		var mod=(ret.smartphoneShare[i]-ret.smartphoneShare[i-1])/5;
 		for(var j=0;j!=5;j++){
 			start += mod;
 			data.smartphoneShare.push(smr3(start));
