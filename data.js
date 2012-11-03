@@ -767,9 +767,9 @@ var iterate = function(is)
 			ret.smartphoneShare.push(smr3(cur.smartphoneShare));
 		}
 	}
-	var smr1=simple_moving_averager(3);
-    var smr2=simple_moving_averager(3);
-    var smr3=simple_moving_averager(3);
+	var smr1=simple_moving_averager(5);
+    var smr2=simple_moving_averager(5);
+    var smr3=simple_moving_averager(5);
 	var data={"volume":[],"phoneShare":[],"smartphoneShare":[]};
 	for(var i=1;i<ret.volume.length;i++){
 		var start=ret.volume[i-1];
