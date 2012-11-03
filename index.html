@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - shaders [custom]</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #ffffff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #050505;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #ffffff;
+			}
+
+			#oldie a { color:#da0 }
+		</style>
+	</head>
+	<body>
+
+	<script>
+		
+		function toggle(el,set,scale){
+			var a=document.getElementsByClassName("filter");
+			for(var i=0;i!=a.length;i++){
+				a[i].style.backgroundColor="black"
+			}
+			el.style.backgroundColor="white";
+			build(set,scale);
+		}
+	</script>
+	<style>
+		body{
+			background-color:black;
+			}
+		#filters{
+			width:100%;
+			margin:auto;
+			text-align:center;
+			position:absolute;
+		}
+		.filter {
+			text-decoration:none;
+			border: 1px solid gray;
+			background-color:white;
+			color:gray;
+			padding: 8px;
+			font-weight:bold;
+		}
+	</style>
+	<div id="filters">
+		<a class="filter" href="#" onclick="toggle(this,'volume',1)" >Volume</a>
+		<a class="filter" style="background-color:black" href="#" onclick="toggle(this,'phoneShare',400)" >Phone Share</a>
+		<a class="filter" style="background-color:black" href="#" onclick="toggle(this,'smartphoneShare',400)" >Smart phone share</a>
+	</div>
+	
+		<div id="container"></div>
+
+		<script src="three.min.js"></script>
+
+		<script src="stats.min.js"></script>
+    <script src="data.js"></script>
+    <script src="neuropol.js"></script>
+    <script src="common.js"></script>
+
+		<script id="fragment_shader4" type="x-shader/x-fragment">
+
+			uniform float time;
+			uniform vec2 resolution;
+
+			varying vec2 vUv;
+
+			void main( void ) {
+
+				vec2 position = -1.0 + 2.0 * vUv;
+
+				float red = abs( sin( position.x * position.y + time / 5.0 ) );
+				float green = abs( sin( position.x * position.y + time / 4.0 ) );
+				float blue = abs( sin( position.x * position.y + time / 3.0 ) );
+				gl_FragColor = vec4( red, green, blue, 1.0 );
+
+			}
+
+		</script>
+
+		<script id="fragment_shader3" type="x-shader/x-fragment">
+
+			uniform float time;
+			uniform vec2 resolution;
+
+			varying vec2 vUv;
+
+			void main( void ) {
+
+				vec2 position = vUv;
+
+				float color = 0.0;
+				color += sin( position.x * cos( time / 15.0 ) * 80.0 ) + cos( position.y * cos( time / 15.0 ) * 10.0 );
+				color += sin( position.y * sin( time / 10.0 ) * 40.0 ) + cos( position.x * sin( time / 25.0 ) * 40.0 );
+				color += sin( position.x * sin( time / 5.0 ) * 10.0 ) + sin( position.y * sin( time / 35.0 ) * 80.0 );
+				color *= sin( time / 10.0 ) * 0.5;
+
+				gl_FragColor = vec4( vec3( color, color * 0.5, sin( color + time / 3.0 ) * 0.75 ), 1.0 );
+
+			}
+
+		</script>
+
+		<script id="fragment_shader2" type="x-shader/x-fragment">
+
+			uniform float time;
+			uniform vec2 resolution;
+
+			uniform sampler2D texture;
+
+			varying vec2 vUv;
+
+			void main( void ) {
+
+				vec2 position = -1.0 + 2.0 * vUv;
+
+				float a = atan( position.y, position.x );
+				float r = sqrt( dot( position, position ) );
+
+				vec2 uv;
+				uv.x = cos( a ) / r;
+				uv.y = sin( a ) / r;
+				uv /= 10.0;
+				uv += time * 0.05;
+
+				vec3 color = texture2D( texture, uv ).rgb;
+
+				gl_FragColor = vec4( color * r * 1.5, 1.0 );
+
+			}
+		</script>
+
+		<script id="fragment_shader1" type="x-shader/x-fragment">
+
+			uniform vec2 resolution;
+			uniform float time;
+
+			varying vec2 vUv;
+
+			void main(void)
+			{
+
+				vec2 p = -1.0 + 2.0 * vUv;
+				float a = time*40.0;
+				float d,e,f,g=1.0/40.0,h,i,r,q;
+
+				e=400.0*(p.x*0.5+0.5);
+				f=400.0*(p.y*0.5+0.5);
+				i=200.0+sin(e*g+a/150.0)*20.0;
+				d=200.0+cos(f*g/2.0)*18.0+cos(e*g)*7.0;
+				r=sqrt(pow(i-e,2.0)+pow(d-f,2.0));
+				q=f/r;
+				e=(r*cos(q))-a/2.0;f=(r*sin(q))-a/2.0;
+				d=sin(e*g)*176.0+sin(e*g)*164.0+r;
+				h=((f+d)+a/2.0)*g;
+				i=cos(h+r*p.x/1.3)*(e+e+a)+cos(q*g*6.0)*(r+h/3.0);
+				h=sin(f*g)*144.0-sin(e*g)*212.0*p.x;
+				h=(h+(f-e)*q+sin(r-(a+h)/7.0)*10.0+i/4.0)*g;
+				i+=cos(h*2.3*sin(a/350.0-q))*184.0*sin(q-(r*4.3+a/12.0)*g)+tan(r*g+h)*184.0*cos(r*g+h);
+				i=mod(i/5.6,256.0)/64.0;
+				if(i<0.0) i+=4.0;
+				if(i>=2.0) i=4.0-i;
+				d=r/350.0;
+				d+=sin(d*d*8.0)*0.52;
+				f=(sin(a*g)+1.0)/2.0;
+				gl_FragColor=vec4(vec3(f*i/1.6,i/2.0+d/13.0,i)*d*p.x+vec3(i/1.3+d/8.0,i/2.0+d/18.0,i)*d*(1.0-p.x),1.0);
+
+			}
+
+		</script>
+
+		<script id="vertexShader" type="x-shader/x-vertex">
+
+			varying vec2 vUv;
+
+			void main()
+			{
+				vUv = uv;
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+				gl_Position = projectionMatrix * mvPosition;
+			}
+
+		</script>
+
+		<script>
+			THREE.Object3D.prototype.clear = function(){
+				var children = this.children;
+				for(var i = children.length-1;i>=0;i--){
+					var child = children[i];
+					child.clear();
+					scene.remove(child);
+				};
+			};
+			var container, stats;
+
+			var start_time;
+
+			var camera, scene, renderer;
+
+			var uniforms1, uniforms2, material1, material2, mesh, meshes = [];
+
+			var mouseX = 0, mouseY = 0,
+			lat = 0, lon = 0, phy = 0, theta = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			var clock = new THREE.Clock();
+
+			init();
+			animate();
+      var plane;
+      
+      var tz;
+      
+      function mousewheel( event )
+      {
+          var v = event.wheelDeltaY/100;
+      
+          if (event.wheelDeltaY>0)
+            tz*=v;
+          else
+            tz/=-v;
+      }
+      
+      var drag=false;
+      var dragx=0;
+      
+      function mousedown(event)
+      {
+          drag=true;
+          dragx=event.x;
+      }
+      
+      function mouseup(event)
+      {
+          drag=false;
+      }
+      
+      function mousemove(event)
+      {
+        if (drag) 
+        {
+          tx+=(dragx-event.clientX);
+          dragx=event.clientX;
+        }
+      }
+
+      function v3(x,y,z) 
+      {
+        return new THREE.Vector3(x,y,z);
+      };
+      
+      function buildFootprint(samples,base, color, scale)
+      {
+            var geo = new THREE.Geometry();
+            for (var i=0;i<(samples.length-1);i++)
+						{
+						  var x = i;
+						  
+						  var sam0= samples[i]*scale;
+						  var sam1= samples[i+1]*scale;
+						  var bas0= base===null?0:base.geometry.vertices[i*4+3].y;
+						  var bas1= base===null?0:base.geometry.vertices[i*4+2].y;
+						  sam0+=2;
+						  sam1+=2;
+						  
+              geo.vertices.push(
+                v3( x + 0, bas0 + 0, 0 ),   //l,b
+                v3( x + 1, bas1 + 0, 0 ),   //r,b
+                v3( x + 1, bas1 + sam1, 0 ),  //r,t
+                v3( x + 0, bas0 + sam0, 0 )   //l,t
+              );
+              
+              var face = new THREE.Face4(i*4+0, i*4+1, i*4+2, i*4+3);
+              geo.faces.push(face);
+            } 
+						
+						gv = new THREE.Mesh( geo, new THREE.MeshBasicMaterial( { "color":color }  ));
+						
+						gv.position.z = 0;
+						gv.position.x=-samples.length/2;
+						
+						return gv;
+      }
+  
+      var group ;
+      var months;
+      
+      function MonthText(month, year)
+      {
+            var t0 = new THREE.Mesh(new THREE.TextGeometry(month,{size:12,height:0.2,curveSegments:6,font:'neuropol',weight: "normal", style: "normal"}),new THREE.MeshBasicMaterial( { color:0xFF0000 }  ));
+						var t1 = new THREE.Mesh(new THREE.TextGeometry(year,{size:12,height:0.2,curveSegments:6,font:'neuropol',weight: "normal", style: "normal"}),new THREE.MeshBasicMaterial( { color:0xFF0000 }  ));
+						
+						t0.geometry.computeBoundingBox();
+						t1.geometry.computeBoundingBox();
+						
+						t1.position.x = (t0.geometry.boundingBox.min.x + t0.geometry.boundingBox.max.x)/2 - (t1.geometry.boundingBox.max.x + t1.geometry.boundingBox.min.x)/2;
+						t1.position.y = - (t0.geometry.boundingBox.max.y-t0.geometry.boundingBox.min.y);
+						
+						var tm = 	new THREE.Object3D();
+						
+						tm.add(t0);
+						tm.add(t1);
+						
+						return tm;
+      }
+      
+      function LegendText(name, color, prev)
+      {
+            var t0 = new THREE.Mesh(new THREE.TextGeometry(name,{size:12,height:0.2,curveSegments:6,font:'neuropol',weight: "normal", style: "normal"}),new THREE.MeshBasicMaterial( { "color":color }  ));
+						
+						t0.geometry.computeBoundingBox();
+						
+						if (prev != null)
+              t0.position.x = prev.position.x + (prev.geometry.boundingBox.max.x - prev.geometry.boundingBox.min.x) + 15;
+            else
+              t0.position.x = -400;
+              
+              t0.position.y = -150;
+              
+              console.log(t0.position.x);
+						
+						return t0;
+      }
+      
+      function reset()
+      {
+          tz=0.2;
+          tx=0;
+          
+          camera.position.z = 0.1;
+      }
+      
+      function build(infodata, scale)
+      {
+         scene.clear();
+      	{
+              plane = new THREE.PlaneGeometry( window.innerWidth*100, window.innerHeight*100 );
+
+              quad = new THREE.Mesh( plane, new THREE.MeshBasicMaterial( { color:0, opacity: 0.22 }  ));
+              
+              quad.position.z = -100;
+              
+              scene.add( quad );
+						}
+						
+						var prev = null;
+						var prevtext = null;
+						
+						var ox=-100;
+						
+						group = new THREE.Object3D();
+						groupleg = new THREE.Object3D();
+						
+						scene.add(group);
+						for(var j in mobile) 
+						{
+              prev=buildFootprint(iterate(mobile[j]).data[infodata],prev,colors[j],scale);
+              prev.position.y=ox;
+              ox += 2;
+              
+              group.add( prev );
+              
+              prevtext=LegendText(j,colors[j],prevtext);
+              groupleg.add(prevtext);
+              
+						}
+						
+						scene.add(groupleg);
+      }
+      
+			function init() 
+			{
+        months =  { };
+
+       window.addEventListener('DOMMouseScroll', mousewheel, false);
+       window.addEventListener('mousewheel', mousewheel, false);
+       
+       window.addEventListener("mouseup", mouseup, false);
+       window.addEventListener("mousemove", mousemove, false);
+       window.addEventListener("mousedown", mousedown, false);
+  
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 2000, 1000 );
+
+				scene = new THREE.Scene();
+
+				start_time = Date.now();
+
+				uniforms1 = {
+					time: { type: "f", value: 1.0 },
+					resolution: { type: "v2", value: new THREE.Vector2() }
+				};
+
+				uniforms2 = {
+					time: { type: "f", value: 1.0 },
+					resolution: { type: "v2", value: new THREE.Vector2() },
+					texture: { type: "t", value: THREE.ImageUtils.loadTexture( "textures/disturb.jpg" ) }
+				};
+
+				uniforms2.texture.value.wrapS = uniforms2.texture.value.wrapT = THREE.RepeatWrapping;
+
+
+					
+				var size =200, mlib = [],
+					params = [ [ 'fragment_shader1', uniforms1 ],  [ 'fragment_shader2', uniforms2 ], [ 'fragment_shader3', uniforms1 ], [ 'fragment_shader4', uniforms1 ] ];
+
+				renderer = new THREE.WebGLRenderer( { preserveDrawingBuffer: true, antialias: true} );
+				renderer.autoClearColor=false;
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+
+        build("volume",1);
+				onWindowResize();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+        reset();
+			}
+
+			function onWindowResize( event ) {
+
+				uniforms1.resolution.value.x = window.innerWidth;
+				uniforms1.resolution.value.y = window.innerHeight;
+
+				uniforms2.resolution.value.x = window.innerWidth;
+				uniforms2.resolution.value.y = window.innerHeight;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var delta = clock.getDelta();
+
+				uniforms1.time.value += delta * 5;
+				uniforms2.time.value = clock.elapsedTime;
+
+				for( var i = 0; i < meshes.length; ++ i ) {
+
+					meshes[ i ].rotation.y += delta * 0.5 * ( i % 2 ? 1 : -1 );
+					meshes[ i ].rotation.x += delta * 0.5 * ( i % 2 ? -1 : 1 );
+
+				}
+				
+				group.scale.x += ( tz - group.scale.x) / 3;
+				camera.position.x+= ( tx - camera.position.x) / 3;
+				
+				camera.updateProjectionMatrix();
+				
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
