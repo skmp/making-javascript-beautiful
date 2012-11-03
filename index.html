@@ -484,7 +484,7 @@
 				}
 				
 				group.scale.x += ( tz - group.scale.x) / 3;
-				camera.position.x+= ( tx - camera.position.x) / 3;
+				group.position.x -= ( tx + group.position.x) / 3;
 				
 				camera.updateProjectionMatrix();
 				
