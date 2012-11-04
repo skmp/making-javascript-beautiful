@@ -211,6 +211,8 @@
 					scene.remove(child);
 				};
 			};
+			
+			var monthtext;
 			var container, stats;
 
 			var start_time;
@@ -271,6 +273,26 @@
           tx+=(dragx-event.clientX);
           dragx=event.clientX;
         }
+        else
+        {
+          var cx=  event.clientX - window.innerWidth  / 2 - group.position.x;
+          var cy= -event.clientY + window.innerHeight / 2 - group.position.y;
+          
+          monthtext.position.x=cx;
+          monthtext.position.y=cy;
+            
+          cx = cx / group.scale.x;
+          
+          if (cx >= group.boundingBox.min.x && cx <= group.boundingBox.max.x &&
+              cy >= group.boundingBox.min.y &&  cy <= group.boundingBox.max.y)
+          {
+            var ox=cx-group.boundingBox.min.x;
+            var oy=cy-group.boundingBox.min.y;
+            
+            console.log(ox,oy);
+            
+          }
+        }
       }
 
       function v3(x,y,z) 
@@ -283,7 +305,7 @@
             var geo = new THREE.Geometry();
             for (var i=0;i<(samples.length-1);i++)
 						{
-						  var x = i;
+						  var x = i - samples.length/2 ;
 						  
 						  var sam0= samples[i]*scale;
 						  var sam1= samples[i+1]*scale;
@@ -304,9 +326,6 @@
             } 
 						
 						gv = new THREE.Mesh( geo, new THREE.MeshBasicMaterial( { "color":color }  ));
-						
-						gv.position.z = 0;
-						gv.position.x=-samples.length/2;
 						
 						return gv;
       }
@@ -359,9 +378,13 @@
           camera.position.z = 0.1;
       }
       
+      
       function build(infodata, scale)
       {
-         scene.clear();
+        scene.clear();
+        monthtext=MonthText("X","X");
+        scene.add(monthtext);
+         
       	{
               plane = new THREE.PlaneGeometry( window.innerWidth*100, window.innerHeight*100 );
 
@@ -394,6 +417,10 @@
               
 						}
 						
+						prev.geometry.computeBoundingBox();
+						group.boundingBox=prev.geometry.boundingBox;
+						group.boundingBox.min.y=-100;
+												
 						scene.add(groupleg);
       }
       
