@@ -238,7 +238,7 @@
 		projector.unprojectVector( vector, camera );
 		var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
 		var intersects = ray.intersectObjects( meshes);
-		retur intersects;
+		return intersects;
       }
       function mousewheel( event )
       {
